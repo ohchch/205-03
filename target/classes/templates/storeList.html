@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <title>Store List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        .button {
+            display: inline-block;
+            padding: 8px 12px;
+            margin-right: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+        }
+        .button.edit {
+            background-color: #008CBA;
+        }
+        .button.delete {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Store List</h1>
+        <a th:href="@{/stores/add}" class="button">Add Store</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="store : ${stores}">
+                    <td th:text="${store.name}"></td>
+                    <td th:text="${store.phoneNumber}"></td>
+                    <td th:text="${store.email}"></td>
+                    <td th:text="${store.unitNumber + ', ' + store.streetName + ', ' + store.residentialArea + ', ' + store.postalCode + ', ' + store.city + ', ' + store.state + ', ' + store.country}"></td>
+                    
+                    <td>
+                        <div sec:authorize=hasAuthority('Administrator')>
+                            <a th:href="@{/stores/edit/{id}(id=${store.id})}" class="button edit">Edit</a>
+                            <form th:action="@{/stores/delete/{id}(id=${store.id})}" method="post" style="display:inline;">
+                                <input type="hidden" name="_method" value="delete">
+                                <input type="submit" class="button delete" value="Delete" onclick="return confirm('Are you sure you want to delete this store?');">
+                            </form>
+                        </div>
+                    </td>
+                
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

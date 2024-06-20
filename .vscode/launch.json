@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "StoresApplication",
+            "request": "launch",
+            "mainClass": "com.example.billingservice.stores.StoresApplication",
+            "projectName": "billingservice"
+        },
+        {
+            "type": "java",
+            "name": "StoresApplication",
+            "request": "launch",
+            "mainClass": "com.example.stores.StoresApplication",
+            "projectName": "billingservice",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=57600 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=billingservice"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BillingserviceApplication<billingservice>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.billingservice.BillingserviceApplication",
+            "projectName": "billingservice",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

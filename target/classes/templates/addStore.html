@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Store</title>
+    <!-- JavaScript -->
+    <script th:inline="javascript">
+        /* JavaScript */
+        function confirmAdd() {
+            var form = document.getElementById('storeForm');
+            var name = document.getElementById('name').value;
+            var phoneNumber = document.getElementById('phoneNumber').value;
+            var email = document.getElementById('email').value;
+
+            if (name.trim() === '' || phoneNumber.trim() === '' || email.trim() === '') {
+                alert('Please fill in all fields.');
+                return false;
+            }
+
+            // 手动调用表单的 checkValidity() 方法来触发浏览器的验证
+            if (!form.checkValidity()) {
+                // 如果表单验证失败，浏览器会自动显示相应的错误信息
+                return false;
+            }
+
+            // 表单验证通过，显示确认消息
+            var result = confirm("Are you sure you want to add this store?");
+            return result;
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+        #response, #paymentResponse {
+            margin-top: 20px;
+            color: red; /* 设置错误消息的颜色为红色 */
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            text-align: left;
+        }
+        input[type=text], input[type=email], input[type=password] {
+            width: 300px;
+            padding: 8px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add a New Store</h1>
+        <!-- 显示错误消息 -->
+        <p id="response" th:if="${errorMessage}" th:text="${errorMessage}" style="font-weight: bold;"></p>
+            <!-- 表单提交结果消息 -->
+            <p id="response" th:text="${message}"></p>
+        
+        <form id="storeForm" th:action="@{/stores/add}" th:object="${store}" method="post" onsubmit="return confirmAdd()">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" th:field="*{name}" required><br>
+            
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" th:field="*{phoneNumber}" pattern="^(\+?60|0)1\d{8,9}$" required><br>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" th:field="*{email}" required><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+            
+            <label for="unitNumber">Unit Number:</label>
+            <input type="text" id="unitNumber" name="unitNumber" th:field="*{unitNumber}" required><br>
+            
+            <label for="streetName">Street Name:</label>
+            <input type="text" id="streetName" name="streetName" th:field="*{streetName}" required><br>
+            
+            <label for="residentialArea">Residential Area:</label>
+            <input type="text" id="residentialArea" name="residentialArea" th:field="*{residentialArea}" required><br>
+            
+            <label for="postalCode">Postal Code:</label>
+            <input type="text" id="postalCode" name="postalCode" th:field="*{postalCode}" required><br>
+            
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" th:field="*{city}" required><br>
+            
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state" th:field="*{state}" required><br>
+
+            <input type="hidden" id="country" name="country" th:value="Malaysia">
+            
+            <input type="submit" value="Add Store" class="button"> <!-- 现在只调用 confirmAdd() 来进行格式验证 -->
+        </form>
+        <br>
+        <a th:href="@{/stores/all}" class="button">View Stores</a>
+        <a th:href="@{/login}" class="button">Login</a>
+        <a th:href="@{/logout}" class="button">Logout</a>
+
+    </div>
+</body>
+</html>

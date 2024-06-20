@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+        #response, #paymentResponse {
+            margin-top: 20px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            text-align: left;
+        }
+        input[type=text], input[type=email] {
+            width: 300px;
+            padding: 8px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Store</h1>
+        <p id="response" th:text="${message}"></p>
+        <form id="storeForm" th:action="@{/stores/edit/{id}(id=${store.id})}" th:object="${store}" method="post">
+            <input type="hidden" th:field="*{id}">
+            
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" th:field="*{name}" required><br>
+            
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" th:field="*{phoneNumber}" pattern="^(\+?60|0)1\d{8,9}$" required><br>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" th:field="*{email}" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required><br>
+            
+            <label for="unitNumber">Unit Number:</label>
+            <input type="text" id="unitNumber" name="unitNumber" th:field="*{unitNumber}" required><br>
+            
+            <label for="streetName">Street Name:</label>
+            <input type="text" id="streetName" name="streetName" th:field="*{streetName}" required><br>
+            
+            <label for="residentialArea">Residential Area:</label>
+            <input type="text" id="residentialArea" name="residentialArea" th:field="*{residentialArea}" required><br>
+            
+            <label for="postalCode">Postal Code:</label>
+            <input type="text" id="postalCode" name="postalCode" th:field="*{postalCode}" required><br>
+            
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" th:field="*{city}" required><br>
+            
+            <label for="state">State:</label>
+            <input type="text" id="state" name="state" th:field="*{state}" required><br>
+            <input type="hidden" id="country" name="country" th:value="Malaysia">
+            
+            <input type="submit" value="Update Store" class="button">
+        </form>
+        <br>
+        <a th:href="@{/stores/all}" class="button">Cancel</a>
+
+    </div>
+</body>
+</html>

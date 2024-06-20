@@ -17,104 +17,114 @@ import java.util.List;
 @RequestMapping("/stores")
 public class StoreController {
 
+    // Inject the StoreService bean
     @Autowired
     private StoreService storeService;
 
+    // Inject the UserService bean
     @Autowired
     private UserService userService;
 
+    // Handle GET requests to fetch all stores
     @GetMapping("/all")
     public String getAllStores(Model model) {
         List<StoreDTO> stores = storeService.getAllStores();
         model.addAttribute("stores", stores);
-        return "storeList"; // 对应模板文件名为 storeList.html
+        return "storeList"; // Corresponds to the storeList.html template
     }
 
+    // Handle GET requests to show the form for adding a new store
     @GetMapping("/add")
     public String showAddStoreForm(Model model) {
         model.addAttribute("store", new StoreDTO());
-        return "addStore"; // 对应模板文件名为 addStore.html
+        return "addStore"; // Corresponds to the addStore.html template
     }
 
+    // Handle POST requests to add a new store
     @PostMapping("/add")
     public String addStore(@ModelAttribute("store") StoreDTO storeDTO,
                            @RequestParam String email,
                            @RequestParam String password,
                            Model model) {
         try {
-            // 添加商店逻辑
+            // Add the store logic
             storeService.addStore(storeDTO);
-    
-            // 创建并保存 User 到数据库
-            User user = new User(email, password); // 这里假设User类有相应的构造方法
-            userService.saveUser(user); // 调用保存用户的方法
-    
+
+            // Create and save a User to the database
+            User user = new User(email, password); // Assuming User class has a corresponding constructor
+            userService.saveUser(user); // Call the saveUser method
+
             model.addAttribute("message", "Store and User added successfully!");
-            return "success"; // 对应模板文件名为 success.html，用于显示添加成功的页面
+            return "success"; // Corresponds to the success.html template for showing the success message
         } catch (IllegalArgumentException e) {
             model.addAttribute("message", e.getMessage());
-            return "addStore"; // 返回添加商店的页面
+            return "addStore"; // Return to the add store page
         } catch (Exception e) {
             model.addAttribute("message", "Failed to add store and user.");
-            return "addStore"; // 返回添加商店的页面
+            return "addStore"; // Return to the add store page
         }
     }
 
+    // Handle GET requests to show the form for editing an existing store
     @GetMapping("/edit/{id}")
     public String showEditStoreForm(@PathVariable Long id, Model model) {
         try {
             StoreDTO storeDTO = storeService.getStoreById(id);
             model.addAttribute("store", storeDTO);
-            return "edit"; // 对应模板文件名为 edit.html
+            return "edit"; // Corresponds to the edit.html template
         } catch (ResourceNotFoundException e) {
             model.addAttribute("message", "Store not found.");
-            return "error"; // 对应模板文件名为 error.html，用于显示错误信息
+            return "error"; // Corresponds to the error.html template for showing error messages
         } catch (Exception e) {
             model.addAttribute("message", "Failed to retrieve store.");
-            return "error"; // 对应模板文件名为 error.html，用于显示错误信息
+            return "error"; // Corresponds to the error.html template for showing error messages
         }
     }
 
+    // Handle POST requests to update an existing store
     @PostMapping("/edit/{id}")
     public String updateStore(@PathVariable Long id,
                               @ModelAttribute("store") StoreDTO storeDTO,
                               Model model) {
         try {
-            storeDTO.setId(id); // 确保 ID 一致性
+            storeDTO.setId(id); // Ensure the ID is consistent
             storeService.updateStore(storeDTO);
             model.addAttribute("message", "Store updated successfully!");
-            return "edit"; // 对应模板文件名为 edit.html
+            return "edit"; // Corresponds to the edit.html template
         } catch (ResourceNotFoundException e) {
             model.addAttribute("message", "Store not found.");
-            return "error"; // 对应模板文件名为 error.html，用于显示错误信息
+            return "error"; // Corresponds to the error.html template for showing error messages
         } catch (Exception e) {
             model.addAttribute("message", "Failed to update store.");
-            return "error"; // 对应模板文件名为 error.html，用于显示错误信息
+            return "error"; // Corresponds to the error.html template for showing error messages
         }
     }
 
+    // Handle POST requests to delete an existing store
     @PostMapping("/delete/{id}")
     public String deleteStore(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            storeService.deleteStoreById(id); // 调用 deleteStoreById 方法
+            storeService.deleteStoreById(id); // Call the deleteStoreById method
             redirectAttributes.addFlashAttribute("message", "Store deleted successfully!");
-            return "redirect:/stores/all"; // 重定向到所有商店列表页面
+            return "redirect:/stores/all"; // Redirect to the list of all stores
         } catch (ResourceNotFoundException e) {
             model.addAttribute("message", "Store not found.");
-            return "error"; // 对应模板文件名为 error.html，用于显示错误信息
+            return "error"; // Corresponds to the error.html template for showing error messages
         } catch (Exception e) {
             model.addAttribute("message", "Failed to delete store.");
-            return "error"; // 对应模板文件名为 error.html，用于显示错误信息
+            return "error"; // Corresponds to the error.html template for showing error messages
         }
     }
 
+    // Handle GET requests for access denied page
     @GetMapping("/access-denied")
     public String accessDeniedPage() {
-        return "access-denied";
+        return "access-denied"; // Corresponds to the access-denied.html template
     }
 
+    // Handle POST requests for access denied page
     @PostMapping("/access-denied")
     public String handlePostAccessDenied() {
-        return "access-denied";
+        return "access-denied"; // Corresponds to the access-denied.html template
     }
 }

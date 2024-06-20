@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Add Store</title>
-    <!-- JavaScript -->
+    <!-- JavaScript for form validation -->
     <script th:inline="javascript">
         /* JavaScript */
         function confirmAdd() {
@@ -11,18 +11,19 @@
             var phoneNumber = document.getElementById('phoneNumber').value;
             var email = document.getElementById('email').value;
 
+            // Check if all required fields are filled
             if (name.trim() === '' || phoneNumber.trim() === '' || email.trim() === '') {
                 alert('Please fill in all fields.');
                 return false;
             }
 
-            // 手动调用表单的 checkValidity() 方法来触发浏览器的验证
+            // Trigger browser validation
             if (!form.checkValidity()) {
-                // 如果表单验证失败，浏览器会自动显示相应的错误信息
+                // If form validation fails, the browser will show the error messages
                 return false;
             }
 
-            // 表单验证通过，显示确认消息
+            // If form validation passes, show a confirmation message
             var result = confirm("Are you sure you want to add this store?");
             return result;
         }
@@ -58,9 +59,9 @@
             box-shadow: 0 5px #666;
             transform: translateY(4px);
         }
-        #response, #paymentResponse {
+        #response {
             margin-top: 20px;
-            color: red; /* 设置错误消息的颜色为红色 */
+            color: red; /* Set the color of error messages to red */
         }
         label {
             display: inline-block;
@@ -80,10 +81,10 @@
 <body>
     <div class="container">
         <h1>Add a New Store</h1>
-        <!-- 显示错误消息 -->
+        <!-- Display error message if any -->
         <p id="response" th:if="${errorMessage}" th:text="${errorMessage}" style="font-weight: bold;"></p>
-            <!-- 表单提交结果消息 -->
-            <p id="response" th:text="${message}"></p>
+        <!-- Form submission result message -->
+        <p id="response" th:text="${message}"></p>
         
         <form id="storeForm" th:action="@{/stores/add}" th:object="${store}" method="post" onsubmit="return confirmAdd()">
             <label for="name">Name:</label>
@@ -118,13 +119,12 @@
 
             <input type="hidden" id="country" name="country" th:value="Malaysia">
             
-            <input type="submit" value="Add Store" class="button"> <!-- 现在只调用 confirmAdd() 来进行格式验证 -->
+            <input type="submit" value="Add Store" class="button">
         </form>
         <br>
         <a th:href="@{/stores/all}" class="button">View Stores</a>
         <a th:href="@{/login}" class="button">Login</a>
         <a th:href="@{/logout}" class="button">Logout</a>
-
     </div>
 </body>
 </html>

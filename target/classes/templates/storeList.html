@@ -45,6 +45,7 @@
 <body>
     <div class="container">
         <h1>Store List</h1>
+        <!-- Link to add a new store -->
         <a th:href="@{/stores/add}" class="button">Add Store</a>
         <table>
             <thead>
@@ -57,6 +58,7 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Iterate over the list of stores and display each store's details -->
                 <tr th:each="store : ${stores}">
                     <td th:text="${store.name}"></td>
                     <td th:text="${store.phoneNumber}"></td>
@@ -64,7 +66,8 @@
                     <td th:text="${store.unitNumber + ', ' + store.streetName + ', ' + store.residentialArea + ', ' + store.postalCode + ', ' + store.city + ', ' + store.state + ', ' + store.country}"></td>
                     
                     <td>
-                        <div sec:authorize=hasAuthority('Administrator')>
+                        <!-- Show edit and delete buttons only for users with 'Administrator' authority -->
+                        <div sec:authorize="hasAuthority('Administrator')">
                             <a th:href="@{/stores/edit/{id}(id=${store.id})}" class="button edit">Edit</a>
                             <form th:action="@{/stores/delete/{id}(id=${store.id})}" method="post" style="display:inline;">
                                 <input type="hidden" name="_method" value="delete">

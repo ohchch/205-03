@@ -1,6 +1,5 @@
 package com.example.billingservice.repositories;
 
-
 import com.example.billingservice.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

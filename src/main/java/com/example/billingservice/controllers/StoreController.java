@@ -3,8 +3,6 @@ package com.example.billingservice.controllers;
 import com.example.billingservice.dto.StoreDTO;
 import com.example.billingservice.exceptions.ResourceNotFoundException;
 import com.example.billingservice.services.StoreService;
-import com.example.billingservice.services.UserService;
-import com.example.billingservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +19,6 @@ public class StoreController {
     @Autowired
     private StoreService storeService;
 
-    // Inject the UserService bean
-    @Autowired
-    private UserService userService;
 
     // Handle GET requests to fetch all stores
     @GetMapping("/all")
@@ -49,11 +44,6 @@ public class StoreController {
         try {
             // Add the store logic
             storeService.addStore(storeDTO);
-
-            // Create and save a User to the database
-            User user = new User(email, password); // Assuming User class has a corresponding constructor
-            userService.saveUser(user); // Call the saveUser method
-
             model.addAttribute("message", "Store and User added successfully!");
             return "success"; // Corresponds to the success.html template for showing the success message
         } catch (IllegalArgumentException e) {

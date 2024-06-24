@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Delete Store</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            margin: 50px;
+        .header {
+            background-color: #f1f1f1;
+            padding: 20px;
             text-align: center;
+            border-bottom: 1px solid #ccc;
         }
-        .button {
+        .header .button {
             display: inline-block;
             padding: 10px 20px;
             margin: 10px;
@@ -25,10 +23,10 @@
             border-radius: 15px;
             box-shadow: 0 9px #999;
         }
-        .button:hover {
+        .header .button:hover {
             background-color: #3e8e41;
         }
-        .button:active {
+        .header .button:active {
             background-color: #3e8e41;
             box-shadow: 0 5px #666;
             transform: translateY(4px);
@@ -36,10 +34,11 @@
     </style>
 </head>
 <body>
-    <div th:insert="~{fragments/header :: header}"></div>
-    <div class="container">
-        <h1 th:text="${message}"></h1>
-        <a th:href="@{/stores/all}" class="button">Back to Store List</a>
+    <div class="header" th:fragment="header">
+        <h1>My Application</h1>
+        <a href="/home" class="button">Home</a>
+        <a href="/login" class="button">Login</a>
+        <a href="/register" class="button">Register</a>
     </div>
 </body>
 </html>

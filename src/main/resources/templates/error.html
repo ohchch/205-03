@@ -4,6 +4,7 @@
     <title>Error</title>
 </head>
 <body>
+    <div th:insert="~{fragments/header :: header}"></div>
     <h1>Something went wrong!</h1>
     <p>We couldn't find the resource you were looking for.</p>
     <p th:if="${status}">Status: <span th:text="${status}"></span></p>

@@ -1,6 +1,6 @@
 package com.example.billingservice;
 
-import com.example.billingservice.controllers.LoginController;
+import com.example.billingservice.controllers.UserController;
 import com.example.billingservice.services.UserService;
 import com.example.billingservice.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +15,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@WebMvcTest(LoginController.class)
-public class LoginControllerTest {
+@WebMvcTest(UserController.class)
+public class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Registration</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,15 +33,16 @@
             box-shadow: 0 5px #666;
             transform: translateY(4px);
         }
-        #response, #paymentResponse {
+        #response {
             margin-top: 20px;
+            color: red;
         }
         label {
             display: inline-block;
             width: 150px;
             text-align: left;
         }
-        input[type=text], input[type=email] {
+        input[type=text], input[type=email], input[type=password] {
             width: 300px;
             padding: 8px;
             margin: 5px 0 15px 0;
@@ -48,12 +51,23 @@
             border-radius: 4px;
         }
     </style>
-<head>
-    <title>Success</title>
 </head>
 <body>
     <div th:insert="~{fragments/header :: header}"></div>
-    <h1>Store added successfully!</h1>
-    <a th:href="@{/stores/all}" class="button">stores List</a>
+    <div class="container">
+        <h1>Register User</h1>
+        <p id="response" th:if="${errorMessage}" th:text="${errorMessage}" style="font-weight: bold;"></p>
+        <p id="response" th:text="${message}"></p>
+
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" th:field="*{email}" required><br>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" th:field="*{password}" required><br>
+
+            <button type="submit" class="button">Register</button>
+        </form>
+    </div>
 </body>
 </html>

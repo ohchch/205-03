@@ -12,8 +12,8 @@ public class User {
     private Long id;
 
     private String email;
-
     private String password;
+    private String username;  // 添加这个属性
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -27,9 +27,10 @@ public class User {
     public User() {
     }
 
-    public User(String email, String password) {
+    public User(String email, String password, String username) {
         this.email = email;
         this.password = password;
+        this.username = username;  // 修改构造函数
     }
 
     public Long getId() {
@@ -56,6 +57,14 @@ public class User {
         this.password = password;
     }
 
+    public String getUsername() {
+        return username;  // 添加这个 getter 方法
+    }
+
+    public void setUsername(String username) {
+        this.username = username;  // 添加这个 setter 方法
+    }
+
     public Set<Permissions> getPermissions() {
         return permissions;
     }
@@ -71,5 +80,4 @@ public class User {
     public void removePermission(Permissions permissions) {
         this.permissions.remove(permissions);
     }
-    
 }

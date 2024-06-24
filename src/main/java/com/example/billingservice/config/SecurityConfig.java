@@ -29,7 +29,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                .requestMatchers("/stores/add", "/endpoint", "/", "/stores/all", "/stores/access-denied").permitAll()
+                .requestMatchers("/stores/add", "/endpoint", "/", "/stores/all", "/stores/access-denied","/register").permitAll()
                 .requestMatchers("/stores/edit/**", "/stores/delete/**").hasAuthority("Administrator")
                 .anyRequest().denyAll()
             )

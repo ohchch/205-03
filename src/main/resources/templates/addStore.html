@@ -79,6 +79,7 @@
     </style>
 </head>
 <body>
+    <div th:insert="~{fragments/header :: header}"></div>
     <div class="container">
         <h1>Add a New Store</h1>
         <!-- Display error message if any -->
@@ -95,10 +96,7 @@
             
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" th:field="*{email}" required><br>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br>
-            
+   
             <label for="unitNumber">Unit Number:</label>
             <input type="text" id="unitNumber" name="unitNumber" th:field="*{unitNumber}" required><br>
             

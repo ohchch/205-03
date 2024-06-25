@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Car List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+        .img-size-limit {
+            max-width: 300px;
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/header :: header}"></div>
+    <div class="container">
+        <h1>Car List</h1>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Registration</th>
+                <th>Price (RM)</th>
+                <th>Actions</th>
+            </tr>
+            <tr th:each="car : ${cars}">
+                <td th:text="${car.id}">1</td>
+                <td th:if="${car.imagePath != null}">
+                    <img th:src="@{{imagePath}(imagePath=${car.imagePath})}" alt="Car Image" class="img-size-limit"/>
+                </td>
+                <td th:if="${car.imagePath == null}">
+                    No Image
+                </td>
+                <td th:text="${car.name}">Car Name</td>
+                <td th:text="${car.brand}">Car Brand</td>
+                <td th:text="${car.model}">Car Model</td>
+                <td th:text="${car.registration}">Registration</td>
+                <td th:text="${car.price}">Price</td>
+                <td>
+                    <a th:href="@{/cars/edit/{id}(id=${car.id})}" class="button">Edit</a>
+                    <form th:action="@{/cars/delete/{id}(id=${car.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+        <a href="/cars/add" class="button">Add New Car</a>
+    </div>
+    <img th:src="@{/uploads/img/1.png}" alt="Car Image">
+</body>
+</html>

@@ -10,6 +10,7 @@ public class BillingserviceApplication {
 
     // Main method to run the Spring Boot application
     public static void main(String[] args) {
+        System.setProperty("java.io.tmpdir", "src/main/resources/temp");
         // Start the Spring application by running the BillingserviceApplication class
         SpringApplication.run(BillingserviceApplication.class, args);
     }

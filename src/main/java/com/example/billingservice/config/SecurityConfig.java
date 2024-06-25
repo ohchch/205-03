@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 import jakarta.servlet.DispatcherType;
 
@@ -29,14 +31,14 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                .requestMatchers("/stores/add", "/endpoint", "/", "/stores/all", "/stores/access-denied","/register").permitAll()
-                .requestMatchers("/stores/edit/**", "/stores/delete/**").hasAuthority("Administrator")
+                .requestMatchers("/endpoint","/download/{fileName:.+}","/uploads/img/**","/upload","/", "/cars/access-denied","/register","/about","/contact","/cars/add","/cars/all").permitAll()
+                .requestMatchers("/cars/edit/**", "/cars/delete/**").hasAuthority("Administrator")
                 .anyRequest().denyAll()
             )
             .formLogin(formlogin ->
                 formlogin
                     .loginPage("/login")
-                    .defaultSuccessUrl("/stores/all")
+                    .defaultSuccessUrl("/cars/all")
                     .usernameParameter("email")
                     .permitAll()
             )
@@ -72,5 +74,15 @@ public class SecurityConfig {
         AccessDeniedHandlerImpl accessDeniedHandler = new AccessDeniedHandlerImpl();
         accessDeniedHandler.setErrorPage("/stores/access-denied");
         return accessDeniedHandler;
+    }
+
+    @Bean
+    public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowUrlEncodedSlash(true);
+        firewall.setAllowSemicolon(true);
+        firewall.setAllowBackSlash(true);
+        firewall.setAllowUrlEncodedDoubleSlash(true); // 允许双斜杠
+        return firewall;
     }
 }

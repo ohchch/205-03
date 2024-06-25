@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contact Us</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+            text-align: center;
+        }
+        .content {
+            margin: 20px;
+            text-align: left;
+        }
+        .content h2 {
+            color: #4CAF50;
+        }
+        .content p {
+            margin: 10px 0;
+        }
+        form {
+            text-align: left;
+            margin: 0 auto;
+            width: 50%;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type=text], input[type=email], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/header :: header}"></div>
+    <div class="container">
+        <h1>Contact Us</h1>
+        <div class="content">
+            <h2>We'd love to hear from you!</h2>
+            <form th:action="@{/contact}" method="post">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" required></textarea>
+
+                <button type="submit" class="button">Send</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

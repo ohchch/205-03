@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Car</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+            text-align: center;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            text-align: left;
+        }
+        input[type=text], input[type=email], input[type=password] {
+            width: 300px;
+            padding: 8px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+        #response {
+            margin-top: 20px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/header :: header}"></div>
+    <div class="container">
+        <h1>Add Car</h1>
+        <p id="response" th:text="${message}"></p>
+        <form th:action="@{/cars/add}" th:object="${carDTO}" method="post" enctype="multipart/form-data">
+            <label for="image">Car Image (max 10 MB):</label>
+            <input type="file" id="image" name="image" th:field="*{image}" required><br>
+
+            <label for="name">Car Name:</label>
+            <input type="text" id="name" name="name" th:field="*{name}" required><br>
+
+            <label for="brand">Car Brand:</label>
+            <input type="text" id="brand" name="brand" th:field="*{brand}" required><br>
+
+            <label for="model">Car Model:</label>
+            <input type="text" id="model" name="model" th:field="*{model}" required><br>
+
+            <label for="registration">Car Registration:</label>
+            <input type="text" id="registration" name="registration" th:field="*{registration}" required><br>
+
+            <label for="price">Car Price:</label>
+            <input type="text" id="price" name="price" th:field="*{price}" pattern="[0-9]*([.][0-9]{0,2})?" title="Please enter a valid number with up to two decimal places" required><br> RM<br><br>
+
+            <button type="submit" class="button">Add Car</button>
+        </form>
+    </div>
+</body>
+</html>

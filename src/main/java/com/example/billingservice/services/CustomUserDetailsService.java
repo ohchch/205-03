@@ -1,7 +1,7 @@
 package com.example.billingservice.services;
 
-import com.example.billingservice.model.Permissions;
-import com.example.billingservice.model.User;
+import com.example.billingservice.entities.Permissions;
+import com.example.billingservice.entities.User;
 import com.example.billingservice.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,10 +26,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
+
         Set<GrantedAuthority> authorities = new HashSet<>();
         for (Permissions permissions : user.getPermissions()) {
             authorities.add(new SimpleGrantedAuthority(permissions.getPermissions()));
         }
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+
+        // 返回带有用户ID的自定义UserDetails
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), authorities);
     }
 }

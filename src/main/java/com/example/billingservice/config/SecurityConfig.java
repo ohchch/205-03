@@ -7,13 +7,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
-
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import jakarta.servlet.DispatcherType;
 
 @Configuration
@@ -21,9 +22,11 @@ import jakarta.servlet.DispatcherType;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, AuthenticationSuccessHandler customAuthenticationSuccessHandler) {
         this.customUserDetailsService = customUserDetailsService;
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
     }
 
     @Bean
@@ -31,7 +34,8 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                .requestMatchers("/endpoint","/download/{fileName:.+}","/uploads/img/**","/upload","/", "/cars/access-denied","/register","/about","/contact","/cars/add","/cars/all").permitAll()
+                .requestMatchers("/endpoint","/", "/register","/about","/contact").permitAll()
+                .requestMatchers("/download/{fileName:.+}", "/cars/delete/**","/uploads/img/**","/upload","/cars/access-denied","/cars/add","/cars/all","/user/{userId}/cars").hasAnyAuthority("User", "Administrator")
                 .requestMatchers("/cars/edit/**", "/cars/delete/**").hasAuthority("Administrator")
                 .anyRequest().denyAll()
             )
@@ -40,6 +44,7 @@ public class SecurityConfig {
                     .loginPage("/login")
                     .defaultSuccessUrl("/cars/all")
                     .usernameParameter("email")
+                    .successHandler(customAuthenticationSuccessHandler)
                     .permitAll()
             )
             .logout(logout ->
@@ -50,7 +55,8 @@ public class SecurityConfig {
                 exceptionHandling
                     .accessDeniedHandler(accessDeniedHandler())  // 设置自定义访问拒绝处理器
             )
-            .csrf(csrf -> csrf.disable());
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
         return http.build();
     }
@@ -68,11 +74,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         AccessDeniedHandlerImpl accessDeniedHandler = new AccessDeniedHandlerImpl();
-        accessDeniedHandler.setErrorPage("/stores/access-denied");
+        accessDeniedHandler.setErrorPage("/cars/access-denied");  // 确保路径正确
         return accessDeniedHandler;
     }
 

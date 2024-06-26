@@ -36,6 +36,7 @@
     </style>
 </head>
 <body>
+    <div th:replace="~{fragments/header :: header}"></div>
     <h1>Car Deletion Status</h1>
     <div th:if="${message}">
         <p th:text="${message}"></p>

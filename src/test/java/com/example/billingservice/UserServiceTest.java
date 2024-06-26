@@ -3,9 +3,9 @@ package com.example.billingservice;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.example.billingservice.model.User;
-import com.example.billingservice.model.Permissions;
 import com.example.billingservice.repositories.UserRepository;
+import com.example.billingservice.entities.Permissions;
+import com.example.billingservice.entities.User;
 import com.example.billingservice.repositories.PermissionRepository;
 import com.example.billingservice.services.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;

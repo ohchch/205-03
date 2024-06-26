@@ -52,7 +52,7 @@
     <title>Success</title>
 </head>
 <body>
-    <div th:insert="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
     <h1>Cars added successfully!</h1>
     <a th:href="@{/cars/all}" class="button">Cars List</a>
 </body>

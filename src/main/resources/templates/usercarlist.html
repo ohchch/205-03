@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+        .img-size-limit {
+            max-width: 300px;
+            max-height: 200px;
+        }
+    </style>
+    <title>User Cars</title>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <h1>User Cars</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Registration</th>
+                <th>Price</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="car : ${cars}">
+                <td th:text="${car.id}">ID</td>
+                <td th:text="${car.name}">Name</td>
+                <td th:text="${car.brand}">Brand</td>
+                <td th:text="${car.model}">Model</td>
+                <td th:text="${car.registration}">Registration</td>
+                <td th:text="${car.price}">Price</td>
+                <td th:if="${car.imagePath != null}">
+                    <img th:src="@{{imagePath}(imagePath=${car.imagePath})}" alt="Car Image" class="img-size-limit"/>
+                </td>
+                <td th:if="${car.imagePath == null}">
+                    No Image
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

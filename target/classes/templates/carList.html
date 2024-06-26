@@ -52,10 +52,17 @@
             max-height: 200px;
         }
     </style>
+    <script>
+        function confirmDelete(form) {
+            if (confirm("Are you sure you want to delete this car?")) {
+                form.submit();
+            }
+        }
+    </script>
 </head>
 <body>
-    <div th:insert="~{fragments/header :: header}"></div>
-    <div class="container">
+    <div th:replace="~{fragments/header :: header}"></div>
+        <div class="container">
         <h1>Car List</h1>
         <table>
             <tr>
@@ -84,7 +91,7 @@
                 <td>
                     <a th:href="@{/cars/edit/{id}(id=${car.id})}" class="button">Edit</a>
                     <form th:action="@{/cars/delete/{id}(id=${car.id})}" method="post" style="display:inline;">
-                        <button type="submit" class="button">Delete</button>
+                        <button type="button" class="button" onclick="confirmDelete(this.form)">Delete</button>
                     </form>
                 </td>
             </tr>

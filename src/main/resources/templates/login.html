@@ -65,7 +65,7 @@
 </head>
 
 <body>
-    <div th:insert="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
     <div class="container">
         <h1>User Login</h1>
         <form id="loginForm" th:action="@{/login}" method="post">

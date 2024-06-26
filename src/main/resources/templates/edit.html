@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <div th:insert="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
     <div class="container">
         <h1>Edit Car</h1>
         <p id="response" th:text="${message}"></p>

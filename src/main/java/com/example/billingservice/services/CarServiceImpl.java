@@ -27,6 +27,9 @@ public class CarServiceImpl implements CarService {
     @Autowired
     private CarRepository carRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Value("${spring.servlet.multipart.location}")
     private String uploadDir;
 
@@ -45,7 +48,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public CarDTO addCar(CarDTO carDTO, MultipartFile image) throws IOException {
+    public CarDTO addCar(CarDTO carDTO, MultipartFile image, Long userId) throws IOException {
         logger.info("Adding car: {}", carDTO.getName());
         Car car = convertToEntity(carDTO);
         car = carRepository.save(car); // 先保存车辆信息以获取数据库生成的 ID
@@ -54,7 +57,7 @@ public class CarServiceImpl implements CarService {
             saveImage(car, image);
             carRepository.save(car); // 更新车辆信息，包括图片路径
         }
-
+        userService.addCarToUser(userId, car.getId()); // 关联用户和车辆
         return convertToDTO(car);
     }
 

@@ -1,4 +1,4 @@
-package com.example.billingservice.model;
+package com.example.billingservice.entities;
 
 import jakarta.persistence.*;
 import java.util.HashSet;
@@ -23,6 +23,14 @@ public class User {
     )
     private Set<Permissions> permissions = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_car",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "car_id")
+    )
+    private Set<Car> cars = new HashSet<>();
+
     // Constructors, getters, and setters
     public User() {
     }
@@ -30,7 +38,7 @@ public class User {
     public User(String email, String password, String username) {
         this.email = email;
         this.password = password;
-        this.username = username;  // 修改构造函数
+        this.username = username;
     }
 
     public Long getId() {
@@ -58,11 +66,11 @@ public class User {
     }
 
     public String getUsername() {
-        return username;  // 添加这个 getter 方法
+        return username;
     }
 
     public void setUsername(String username) {
-        this.username = username;  // 添加这个 setter 方法
+        this.username = username;
     }
 
     public Set<Permissions> getPermissions() {
@@ -79,5 +87,21 @@ public class User {
 
     public void removePermission(Permissions permissions) {
         this.permissions.remove(permissions);
+    }
+
+    public Set<Car> getCars() {
+        return cars;
+    }
+
+    public void setCars(Set<Car> cars) {
+        this.cars = cars;
+    }
+
+    public void addCar(Car car) {
+        this.cars.add(car);
+    }
+
+    public void removeCar(Car car) {
+        this.cars.remove(car);
     }
 }

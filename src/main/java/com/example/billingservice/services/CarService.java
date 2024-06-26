@@ -12,7 +12,7 @@ public interface CarService {
 
     CarDTO getCarById(Long id) throws ResourceNotFoundException;
 
-    CarDTO addCar(CarDTO carDTO, MultipartFile image) throws IOException;
+    CarDTO addCar(CarDTO carDTO, MultipartFile image, Long userId) throws IOException;
 
     CarDTO updateCar(CarDTO carDTO, MultipartFile image) throws ResourceNotFoundException, IOException;
 

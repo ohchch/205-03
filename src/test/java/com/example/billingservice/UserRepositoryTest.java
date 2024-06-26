@@ -1,6 +1,6 @@
 package com.example.billingservice;
 
-import com.example.billingservice.model.User;
+import com.example.billingservice.entities.User;
 import com.example.billingservice.repositories.UserRepository;
 
 //import org.junit.jupiter.api.BeforeEach;

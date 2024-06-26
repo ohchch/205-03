@@ -53,17 +53,17 @@ public class CarController {
         try {
             CarDTO carDTO = carService.getCarById(id);
             model.addAttribute("carDTO", carDTO);
-            return "editCar";
+            return "edit";
         } catch (ResourceNotFoundException e) {
             model.addAttribute("errorMessage", "Car not found");
             return "redirect:/cars/all";
         }
     }
 
-    @PostMapping("/edit")
+    @PostMapping("/edit/{id}")
     public String editCar(@Valid @ModelAttribute("carDTO") CarDTO carDTO, BindingResult result, @RequestParam("image") MultipartFile image, Model model) {
         if (result.hasErrors()) {
-            return "editCar";
+            return "edit";
         }
 
         try {
@@ -79,14 +79,15 @@ public class CarController {
         return "redirect:/cars/all";
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteCar(@PathVariable Long id, Model model) {
+    @PostMapping("/delete/{id}")
+    public String deleteCarById(@PathVariable Long id, Model model) {
         try {
             carService.deleteCarById(id);
+            model.addAttribute("message", "Car deleted successfully.");
         } catch (ResourceNotFoundException e) {
-            model.addAttribute("errorMessage", "Car not found");
+            model.addAttribute("errorMessage", "Car not found.");
         }
 
-        return "redirect:/cars/all";
+        return "delete";
     }
 }

@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,9 @@ public class CarServiceImpl implements CarService {
 
     @Autowired
     private CarRepository carRepository;
+
+    @Value("${spring.servlet.multipart.location}")
+    private String uploadDir;
 
     private final String UPLOAD_DIR = "\\uploads\\img\\";
 
@@ -77,6 +81,8 @@ public class CarServiceImpl implements CarService {
     public void deleteCarById(Long id) throws ResourceNotFoundException {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+        
+        deleteImageFile(car);
         carRepository.delete(car);
     }
 
@@ -96,6 +102,22 @@ public class CarServiceImpl implements CarService {
 
         car.setImagePath(imagePath.replace("\\", "/")); // 替换路径中的反斜杠
         logger.info("Saved image file to: {}", file.getAbsolutePath()); // 输出文件保存路径信息
+    }
+
+    private void deleteImageFile(Car car) {
+        if (car.getImagePath() != null) {
+            String fullPath = uploadDir + "/" + car.getImagePath().replace("/", File.separator); // 构建完整路径
+            File imageFile = new File(fullPath);
+            if (imageFile.exists()) {
+                if (imageFile.delete()) {
+                    logger.info("Deleted image file: {}", imageFile.getAbsolutePath());
+                } else {
+                    logger.error("Failed to delete image file: {}", imageFile.getAbsolutePath());
+                }
+            } else {
+                logger.warn("Image file not found: {}", imageFile.getAbsolutePath());
+            }
+        }
     }
 
     private CarDTO convertToDTO(Car car) {

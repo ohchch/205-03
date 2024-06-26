@@ -36,10 +36,13 @@
     </style>
 </head>
 <body>
-    <div th:insert="~{fragments/header :: header}"></div>
-    <div class="container">
-        <h1 th:text="${message}"></h1>
-        <a th:href="@{/stores/all}" class="button">Back to Store List</a>
+    <h1>Car Deletion Status</h1>
+    <div th:if="${message}">
+        <p th:text="${message}"></p>
     </div>
+    <div th:if="${errorMessage}">
+        <p th:text="${errorMessage}"></p>
+    </div>
+    <a href="/cars/all">Back to Car List</a>
 </body>
 </html>

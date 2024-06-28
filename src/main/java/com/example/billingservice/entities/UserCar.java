@@ -3,19 +3,30 @@ package com.example.billingservice.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user_car")
+@Table(name = "user_car") // 指定表名
 public class UserCar {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "car_id")
-    private Long carId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id")
+    private Car car;
 
-    // Getters 和 Setters
+    public UserCar() {
+    }
+
+    public UserCar(User user, Car car) {
+        this.user = user;
+        this.car = car;
+    }
+
+    // getters and setters
     public Long getId() {
         return id;
     }
@@ -24,19 +35,19 @@ public class UserCar {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Long getCarId() {
-        return carId;
+    public Car getCar() {
+        return car;
     }
 
-    public void setCarId(Long carId) {
-        this.carId = carId;
+    public void setCar(Car car) {
+        this.car = car;
     }
 }

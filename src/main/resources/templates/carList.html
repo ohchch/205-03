@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Car List</title>
     <style>
@@ -61,8 +61,8 @@
     </script>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-        <div class="container">
+    <div th:insert="~{fragments/header :: header}"></div>
+    <div class="container">
         <h1>Car List</h1>
         <table>
             <tr>
@@ -73,26 +73,39 @@
                 <th>Model</th>
                 <th>Registration</th>
                 <th>Price (RM)</th>
+                <th>Activated</th>
+                <th>Bidding</th>
                 <th>Actions</th>
             </tr>
             <tr th:each="car : ${cars}">
                 <td th:text="${car.id}">1</td>
-                <td th:if="${car.imagePath != null}">
-                    <img th:src="@{{imagePath}(imagePath=${car.imagePath})}" alt="Car Image" class="img-size-limit"/>
-                </td>
-                <td th:if="${car.imagePath == null}">
-                    No Image
+                <td>
+                    <img th:src="@{${car.imagePath}}" alt="Car Image" class="img-size-limit"/>
                 </td>
                 <td th:text="${car.name}">Car Name</td>
                 <td th:text="${car.brand}">Car Brand</td>
                 <td th:text="${car.model}">Car Model</td>
                 <td th:text="${car.registration}">Registration</td>
                 <td th:text="${car.price}">Price</td>
+                <td th:text="${car.carActivate.status}">Status</td>
+                <td>
+                    <p>Current Highest Bid: RM<span th:text="${car.highestBiddingPrice}">0.00</span></p>
+                    <p>Highest Bidder: <span th:text="${car.highestBidderEmail}">No bids yet</span></p>
+                    <form th:action="@{/bidding/submit}" method="post">
+                        <input type="hidden" name="carId" th:value="${car.id}" />
+                        <input type="number" step="0.01" name="biddingPrice" placeholder="Enter your bid" required />
+                        <button type="submit" class="button">Bid</button>
+                    </form>
+                </td>
                 <td>
                     <a th:href="@{/cars/edit/{id}(id=${car.id})}" class="button">Edit</a>
                     <form th:action="@{/cars/delete/{id}(id=${car.id})}" method="post" style="display:inline;">
                         <button type="button" class="button" onclick="confirmDelete(this.form)">Delete</button>
                     </form>
+                    <form th:action="@{/cars/toggleActivate/{id}(id=${car.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="button">Toggle Activate</button>
+                    </form>
+                    
                 </td>
             </tr>
         </table>

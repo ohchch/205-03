@@ -1,6 +1,7 @@
 package com.example.billingservice.services;
 
 import com.example.billingservice.dto.CarDTO;
+import com.example.billingservice.entities.Car;
 import com.example.billingservice.exceptions.ResourceNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,4 +18,8 @@ public interface CarService {
     CarDTO updateCar(CarDTO carDTO, MultipartFile image) throws ResourceNotFoundException, IOException;
 
     void deleteCarById(Long id) throws ResourceNotFoundException;
+
+    void updateActivateStatus(Car car, Integer activateId) ;
+    
+    void toggleActivate(Long carId) throws ResourceNotFoundException;
 }

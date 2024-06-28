@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+        }
+        .profile-info {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: auto;
+            background-color: #f9f9f9;
+        }
+        .profile-info h2 {
+            text-align: center;
+        }
+        .profile-info p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .profile-info .label {
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+    </style>
+</head>
+<body>
+    <div th:insert ="~{fragments/header :: header}"></div>
+    <div class="container">
+        <div class="profile-info">
+            <h2>User Profile</h2>
+            <p><span class="label">User ID:</span> <span th:text="${user.id}">ID</span></p>
+            <p><span class="label">Email:</span> <span th:text="${user.email}">Email</span></p>
+        </div>
+        <div class="form-container">
+            <h3>Change Email</h3>
+            <form th:action="@{/user/change-email}" method="post">
+                <label for="newEmail">New Email:</label>
+                <input type="hidden" name="userId" th:value="${user.id}" />
+                <input type="email" id="newEmail" name="newEmail" required>
+                <button type="submit" class="button">Change Email</button>
+            </form>
+        </div>
+        <div class="form-container">
+            <h3>Change Password</h3>
+            <form th:action="@{/user/change-password}" method="post">
+                <label for="newPassword">New Password:</label>
+                <input type="hidden" name="userId" th:value="${user.id}" />
+                <input type="password" id="newPassword" name="newPassword" required>
+                <button type="submit" class="button">Change Password</button>
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>

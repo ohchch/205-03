@@ -8,11 +8,16 @@ public class CarDTO {
     private String brand;
     private String model;
     private String registration;
-    private double price;
-    private MultipartFile image; // 使用MultipartFile来处理上传的图片数据
-    private String imagePath; // 使用驼峰命名法
+    private Double price;
+    private MultipartFile image;
+    private Long userId;
+    private ActivateDTO carActivate;
+    private String imagePath;
+    private boolean active;
+    private Double highestBiddingPrice;
+    private String highestBidderEmail;
+    
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -53,11 +58,11 @@ public class CarDTO {
         this.registration = registration;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -69,11 +74,53 @@ public class CarDTO {
         this.image = image;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public ActivateDTO getCarActivate() {
+        return carActivate;
+    }
+
+    public void setCarActivate(ActivateDTO carActivate) {
+        this.carActivate = carActivate;
+    }
+
     public String getImagePath() {
         return imagePath;
     }
-
+    
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Double getHighestBiddingPrice() {
+        return highestBiddingPrice;
+    }
+
+    public void setHighestBiddingPrice(Double highestBiddingPrice) {
+        this.highestBiddingPrice = highestBiddingPrice;
+    }
+
+    public String getHighestBidderEmail() {
+        return highestBidderEmail;
+    }
+
+    public void setHighestBidderEmail(String highestBidderEmail) {
+        this.highestBidderEmail = highestBidderEmail;
+    }
+
+    
 }

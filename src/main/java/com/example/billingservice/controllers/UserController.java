@@ -1,12 +1,14 @@
 package com.example.billingservice.controllers;
 
 import com.example.billingservice.entities.User;
+
 import com.example.billingservice.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 
 @Controller
 public class UserController {
@@ -30,7 +32,7 @@ public class UserController {
         if (isAuthenticated) {
             User user = userService.findByEmail(email);
             session.setAttribute("userId", user.getId());
-            return "redirect:/stores/all";
+            return "redirect:/user/" + user.getId() + "/profile";
         } else {
             if (userService.findByEmail(email) == null) {
                 model.addAttribute("errorMessage", "User does not exist.");
@@ -61,6 +63,9 @@ public class UserController {
             return "register";
         }
     }
+
+
+    
 
     @GetMapping("/endpoint")
     public String endpoint() {

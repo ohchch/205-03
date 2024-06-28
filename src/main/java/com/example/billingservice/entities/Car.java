@@ -1,32 +1,56 @@
 package com.example.billingservice.entities;
 
 import jakarta.persistence.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "car")
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-
+    
+    @Column(name = "name")
     private String name;
+    
+    @Column(name = "brand")
     private String brand;
+    
+    @Column(name = "model")
     private String model;
+    
+    @Column(name = "registration")
     private String registration;
-    private double price;
-
+    
+    @Column(name = "price")
+    private Double price;
+    
     @Column(name = "image_path")
     private String imagePath;
 
-    @ManyToMany(mappedBy = "cars")
-    private Set<User> users = new HashSet<>();
+    @Transient
+    private MultipartFile imageFile;
 
-    // Constructors, getters, and setters
+    @OneToOne(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private CarActivate carActivate;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserCar> userCars = new HashSet<>();
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Bidding> biddings;
+
+    @Transient
+    private Double highestBiddingPrice;
+
     public Car() {
     }
 
-    public Car(String name, String brand, String model, String registration, double price, String imagePath) {
+    public Car(String name, String brand, String model, String registration, Double price, String imagePath) {
         this.name = name;
         this.brand = brand;
         this.model = model;
@@ -75,11 +99,11 @@ public class Car {
         this.registration = registration;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -91,21 +115,34 @@ public class Car {
         this.imagePath = imagePath;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public MultipartFile getImageFile() {
+        return imageFile;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setImageFile(MultipartFile imageFile) {
+        this.imageFile = imageFile;
     }
 
-    public void addUser(User user) {
-        this.users.add(user);
-        user.getCars().add(this);
+    public CarActivate getCarActivate() {
+        return carActivate;
     }
 
-    public void removeUser(User user) {
-        this.users.remove(user);
-        user.getCars().remove(this);
+    public void setCarActivate(CarActivate carActivate) {
+        this.carActivate = carActivate;
+    }
+
+    public Set<UserCar> getUserCars() {
+        return userCars;
+    }
+
+    public void setUserCars(Set<UserCar> userCars) {
+        this.userCars = userCars;
+    }
+
+    public Double getHighestBiddingPrice() {
+        return biddings.stream()
+                .map(Bidding::getBiddingPrice)
+                .max(Double::compareTo)
+                .orElse(0.00);
     }
 }

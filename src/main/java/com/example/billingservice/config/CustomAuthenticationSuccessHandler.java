@@ -16,9 +16,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getId();
         request.getSession().setAttribute("userId", userDetails.getId());
         request.getSession().setAttribute("username", userDetails.getUsername());
 
-        response.sendRedirect("/cars/all");
+        response.sendRedirect("/user/" + userId + "/profile");
     }
 }

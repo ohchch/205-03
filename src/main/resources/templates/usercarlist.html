@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+    <title>Car List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,39 +52,54 @@
             max-height: 200px;
         }
     </style>
-    <title>User Cars</title>
+    <script>
+        function confirmDelete(form) {
+            if (confirm("Are you sure you want to delete this car?")) {
+                form.submit();
+            }
+        }
+    </script>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
-    <h1>User Cars</h1>
-    <table>
-        <thead>
+    <div th:insert="~{fragments/header :: header}"></div>
+    <div class="container">
+        <h1>Car List</h1>
+        <table>
             <tr>
                 <th>ID</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Brand</th>
                 <th>Model</th>
                 <th>Registration</th>
-                <th>Price</th>
-                <th>Image</th>
+                <th>Price (RM)</th>
+                <th>Activated</th>
+                <th>Actions</th>
             </tr>
-        </thead>
-        <tbody>
             <tr th:each="car : ${cars}">
-                <td th:text="${car.id}">ID</td>
-                <td th:text="${car.name}">Name</td>
-                <td th:text="${car.brand}">Brand</td>
-                <td th:text="${car.model}">Model</td>
+                <td th:text="${car.id}">1</td>
+                <td>
+                    <img th:src="@{${car.imagePath}}" alt="Car Image" class="img-size-limit"/>
+                </td>
+                <td th:text="${car.name}">Car Name</td>
+                <td th:text="${car.brand}">Car Brand</td>
+                <td th:text="${car.model}">Car Model</td>
                 <td th:text="${car.registration}">Registration</td>
                 <td th:text="${car.price}">Price</td>
-                <td th:if="${car.imagePath != null}">
-                    <img th:src="@{{imagePath}(imagePath=${car.imagePath})}" alt="Car Image" class="img-size-limit"/>
-                </td>
-                <td th:if="${car.imagePath == null}">
-                    No Image
+                <td th:text="${car.active ? 'Activated' : 'Deactivated'}">Status</td>
+                <td>
+                    <a th:href="@{/cars/edit/{id}(id=${car.id})}" class="button">Edit</a>
+                    <form th:action="@{/cars/delete/{id}(id=${car.id})}" method="post" style="display:inline;">
+                        <button type="button" class="button" onclick="confirmDelete(this.form)">Delete</button>
+                    </form>
+                    <form th:action="@{/cars/toggleActivate/{id}(id=${car.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="button">Toggle Activate</button>
+                    </form>
+                    
                 </td>
             </tr>
-        </tbody>
-    </table>
+        </table>
+        <a href="/cars/add" class="button">Add New Car</a>
+    </div>
 </body>
 </html>

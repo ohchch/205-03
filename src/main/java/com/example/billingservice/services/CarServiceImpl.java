@@ -1,15 +1,28 @@
 package com.example.billingservice.services;
 
+import com.example.billingservice.dto.ActivateDTO;
 import com.example.billingservice.dto.CarDTO;
+import com.example.billingservice.entities.Activate;
+import com.example.billingservice.entities.Bidding;
 import com.example.billingservice.entities.Car;
+import com.example.billingservice.entities.CarActivate;
+import com.example.billingservice.entities.User;
 import com.example.billingservice.exceptions.ResourceNotFoundException;
+import com.example.billingservice.repositories.ActivateRepository;
+import com.example.billingservice.repositories.BiddingRepository;
+import com.example.billingservice.repositories.CarActivateRepository;
 import com.example.billingservice.repositories.CarRepository;
+import com.example.billingservice.repositories.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +41,16 @@ public class CarServiceImpl implements CarService {
     private CarRepository carRepository;
 
     @Autowired
-    private UserService userService;
+    private CarActivateRepository carActivateRepository;
+
+    @Autowired
+    private ActivateRepository activateRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private BiddingRepository biddingRepository;
 
     @Value("${spring.servlet.multipart.location}")
     private String uploadDir;
@@ -37,7 +59,9 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarDTO> getAllCars() {
-        return carRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return carRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -48,20 +72,28 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public CarDTO addCar(CarDTO carDTO, MultipartFile image, Long userId) throws IOException {
-        logger.info("Adding car: {}", carDTO.getName());
         Car car = convertToEntity(carDTO);
-        car = carRepository.save(car); // 先保存车辆信息以获取数据库生成的 ID
+
+        car = carRepository.save(car);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.addCar(car);
+        userRepository.save(user);
+
+        saveCarActivate(carDTO, car);
 
         if (!image.isEmpty()) {
             saveImage(car, image);
-            carRepository.save(car); // 更新车辆信息，包括图片路径
         }
-        userService.addCarToUser(userId, car.getId()); // 关联用户和车辆
+
         return convertToDTO(car);
     }
 
     @Override
+    @Transactional
     public CarDTO updateCar(CarDTO carDTO, MultipartFile image) throws ResourceNotFoundException, IOException {
         Car car = carRepository.findById(carDTO.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Car not found"));
@@ -72,53 +104,71 @@ public class CarServiceImpl implements CarService {
         car.setRegistration(carDTO.getRegistration());
         car.setPrice(carDTO.getPrice());
 
+        saveCarActivate(carDTO, car);
+
         if (!image.isEmpty()) {
             saveImage(car, image);
         }
 
-        car = carRepository.save(car); // 更新车辆信息，包括图片路径
+        car = carRepository.save(car);
         return convertToDTO(car);
     }
 
     @Override
+    @Transactional
     public void deleteCarById(Long id) throws ResourceNotFoundException {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car not found"));
-        
+
         deleteImageFile(car);
+
+        carActivateRepository.deleteByCarId(car.getId());
+
         carRepository.delete(car);
     }
+
+
+
+    
+
+    private void saveCarActivate(CarDTO carDTO, Car car) throws ResourceNotFoundException {
+        Activate activate = activateRepository.findByStatus("Activated")
+                .orElseThrow(() -> new ResourceNotFoundException("Activate status 'Activated' not found"));
+    
+        CarActivate carActivate = new CarActivate();
+        carActivate.setCar(car);
+        carActivate.setActivate(activate);
+    
+        carActivateRepository.save(carActivate);
+    }
+    
 
     private void saveImage(Car car, MultipartFile image) throws IOException {
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
         String fileExtension = FilenameUtils.getExtension(originalFilename);
         String fileName = car.getId() + "." + fileExtension;
-        String imagePath = UPLOAD_DIR + fileName; // 存储相对路径
+        String imagePath = UPLOAD_DIR + fileName;
 
-        File file = new File(UPLOAD_DIR + fileName); // 使用完整路径
+        File file = new File(uploadDir + imagePath);
 
         if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs(); // 创建上传目录
+            file.getParentFile().mkdirs();
         }
 
-        image.transferTo(file); // 保存文件到上传目录
+        image.transferTo(file);
 
-        car.setImagePath(imagePath.replace("\\", "/")); // 替换路径中的反斜杠
-        logger.info("Saved image file to: {}", file.getAbsolutePath()); // 输出文件保存路径信息
+        car.setImagePath(imagePath.replace("\\", "/"));
+        logger.info("Saved image file to: " + file.getAbsolutePath());
     }
 
     private void deleteImageFile(Car car) {
-        if (car.getImagePath() != null) {
-            String fullPath = uploadDir + "/" + car.getImagePath().replace("/", File.separator); // 构建完整路径
-            File imageFile = new File(fullPath);
-            if (imageFile.exists()) {
-                if (imageFile.delete()) {
-                    logger.info("Deleted image file: {}", imageFile.getAbsolutePath());
-                } else {
-                    logger.error("Failed to delete image file: {}", imageFile.getAbsolutePath());
-                }
+        String imagePath = car.getImagePath();
+        if (imagePath != null && !imagePath.isEmpty()) {
+            File file = new File(uploadDir + imagePath);
+            if (file.delete()) {
+                logger.info("Deleted image file: " + file.getAbsolutePath());
             } else {
-                logger.warn("Image file not found: {}", imageFile.getAbsolutePath());
+                logger.warn("Failed to delete image file: " + file.getAbsolutePath());
             }
         }
     }
@@ -131,9 +181,29 @@ public class CarServiceImpl implements CarService {
         carDTO.setModel(car.getModel());
         carDTO.setRegistration(car.getRegistration());
         carDTO.setPrice(car.getPrice());
-        carDTO.setImagePath(car.getImagePath()); // 设置图片路径
+        carDTO.setImagePath(car.getImagePath());
+
+        if (car.getCarActivate() != null && car.getCarActivate().getActivate() != null) {
+            Activate activate = car.getCarActivate().getActivate();
+            ActivateDTO activateDTO = new ActivateDTO();
+            activateDTO.setId(activate.getId());
+            activateDTO.setStatus(activate.getStatus());
+            carDTO.setCarActivate(activateDTO);
+            carDTO.setActive("Activated".equals(activate.getStatus()));
+        }
+
+        Bidding highestBid = biddingRepository.findTopByCarOrderByBiddingPriceDesc(car);
+        if (highestBid != null) {
+            carDTO.setHighestBiddingPrice(highestBid.getBiddingPrice());
+            carDTO.setHighestBidderEmail(highestBid.getUser().getEmail());
+        } else {
+            carDTO.setHighestBiddingPrice(0.0);
+            carDTO.setHighestBidderEmail("No bids yet");
+        }
+
         return carDTO;
     }
+
 
     private Car convertToEntity(CarDTO carDTO) {
         Car car = new Car();
@@ -145,4 +215,41 @@ public class CarServiceImpl implements CarService {
         car.setPrice(carDTO.getPrice());
         return car;
     }
+
+    @Transactional
+    public void toggleActivate(Long carId) {
+        Car car = carRepository.findById(carId).orElseThrow(() -> new EntityNotFoundException("Car not found"));
+        CarActivate carActivate = car.getCarActivate();
+
+        if (carActivate == null) {
+            throw new EntityNotFoundException("CarActivate not found for car with id: " + carId);
+        }
+
+        Activate currentActivate = carActivate.getActivate();
+
+        Activate newActivate;
+        if ("Activated".equals(currentActivate.getStatus())) {
+            newActivate = activateRepository.findByStatus("Deactivated")
+                    .orElseThrow(() -> new EntityNotFoundException("Deactivated status not found"));
+        } else {
+            newActivate = activateRepository.findByStatus("Activated")
+                    .orElseThrow(() -> new EntityNotFoundException("Activated status not found"));
+        }
+
+        carActivate.setActivate(newActivate);
+        carActivateRepository.save(carActivate);
+    }
+
+    
+    @Override
+    @Transactional
+    public void updateActivateStatus(Car car, Integer activateId) {
+        Activate activate = activateRepository.findById(activateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Activate not found"));
+    
+        CarActivate carActivate = car.getCarActivate();
+        carActivate.setActivate(activate);
+        carActivateRepository.save(carActivate);
+    }
+    
 }

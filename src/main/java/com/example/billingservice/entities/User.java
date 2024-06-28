@@ -3,6 +3,7 @@ package com.example.billingservice.entities;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class User {
@@ -13,7 +14,7 @@ public class User {
 
     private String email;
     private String password;
-    private String username;  // 添加这个属性
+    private String username;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -23,13 +24,14 @@ public class User {
     )
     private Set<Permissions> permissions = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_car",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "car_id")
-    )
-    private Set<Car> cars = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserCar> userCars = new HashSet<>();
+
+    public Set<Car> getCars() {
+        return userCars.stream()
+                       .map(UserCar::getCar)
+                       .collect(Collectors.toSet());
+    }
 
     // Constructors, getters, and setters
     public User() {
@@ -89,19 +91,29 @@ public class User {
         this.permissions.remove(permissions);
     }
 
-    public Set<Car> getCars() {
-        return cars;
+    public Set<UserCar> getUserCars() {
+        return userCars;
     }
 
-    public void setCars(Set<Car> cars) {
-        this.cars = cars;
+    public void setUserCars(Set<UserCar> userCars) {
+        this.userCars = userCars;
     }
 
     public void addCar(Car car) {
-        this.cars.add(car);
+        UserCar userCar = new UserCar(this, car);
+        this.userCars.add(userCar);
+        car.getUserCars().add(userCar);
     }
 
     public void removeCar(Car car) {
-        this.cars.remove(car);
+        for (UserCar userCar : userCars) {
+            if (userCar.getUser().equals(this) && userCar.getCar().equals(car)) {
+                userCars.remove(userCar);
+                car.getUserCars().remove(userCar);
+                userCar.setUser(null);
+                userCar.setCar(null);
+                break;
+            }
+        }
     }
 }

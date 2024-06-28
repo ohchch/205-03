@@ -22,17 +22,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         for (Permissions permissions : user.getPermissions()) {
             authorities.add(new SimpleGrantedAuthority(permissions.getPermissions()));
         }
 
-        // 返回带有用户ID的自定义UserDetails
         return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), authorities);
     }
 }

@@ -35,14 +35,12 @@ public class SecurityConfig {
             .authorizeHttpRequests((authorize) -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                 .requestMatchers("/endpoint","/", "/register","/about","/contact").permitAll()
-                .requestMatchers("/download/{fileName:.+}", "/cars/delete/**","/uploads/img/**","/upload","/cars/access-denied","/cars/add","/cars/all","/user/{userId}/cars").hasAnyAuthority("User", "Administrator")
-                .requestMatchers("/cars/edit/**", "/cars/delete/**").hasAuthority("Administrator")
+                .requestMatchers("/download/{fileName:.+}", "/cars/delete/**","/uploads/img/**","/upload","/cars/access-denied","/cars/add","/cars/all","/user/{userId}/cars","/user/{userId}/profile","/user/change-email","/user/change-password","/cars/toggleActivate/{id}","/cars/edit/**", "/cars/delete/**","/bidding/submit").hasAnyAuthority("User", "Administrator")
                 .anyRequest().denyAll()
             )
             .formLogin(formlogin ->
                 formlogin
                     .loginPage("/login")
-                    .defaultSuccessUrl("/cars/all")
                     .usernameParameter("email")
                     .successHandler(customAuthenticationSuccessHandler)
                     .permitAll()

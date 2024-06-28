@@ -5,41 +5,46 @@ import com.example.billingservice.entities.Car;
 import com.example.billingservice.exceptions.ResourceNotFoundException;
 import com.example.billingservice.repositories.UserRepository;
 import com.example.billingservice.services.CarService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/cars")
 public class CarController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CarController.class);
+
     @Autowired
     private CarService carService;
 
-    @Autowired  // 注入UserRepository
+    @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/add")
     public String showAddCarForm(Model model, Authentication authentication) {
         model.addAttribute("carDTO", new CarDTO());
 
-        // 获取当前登录用户的ID
         if (authentication != null) {
-            org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+            User principal = (User) authentication.getPrincipal();
             String userEmail = principal.getUsername();
 
-            // 从数据库中获取用户对象
-            com.example.billingservice.entities.User user = userRepository.findByEmail(userEmail);
+            com.example.billingservice.entities.User user = userRepository.findByEmail(userEmail).orElse(null);
             if (user != null) {
                 Long userId = user.getId();
-                model.addAttribute("userId", userId); // 将userId添加到模型中
+                model.addAttribute("userId", userId);
             } else {
                 model.addAttribute("errorMessage", "User not found for email: " + userEmail);
             }
@@ -53,38 +58,52 @@ public class CarController {
         if (result.hasErrors()) {
             return "addCar";
         }
-    
+
         try {
-            // 获取当前登录用户
-            org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+            User principal = (User) authentication.getPrincipal();
             String userEmail = principal.getUsername();
-            com.example.billingservice.entities.User user = userRepository.findByEmail(userEmail);
-            if (user == null || !user.getId().equals(userId)) {
-                throw new ResourceNotFoundException("User not found or unauthorized");
+            com.example.billingservice.entities.User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("User not found or unauthorized"));
+            if (!user.getId().equals(userId)) {
+                throw new ResourceNotFoundException("Unauthorized");
             }
-    
-            // 创建 Car 对象并设置属性
+
             Car car = new Car();
             car.setName(carDTO.getName());
             car.setBrand(carDTO.getBrand());
             car.setModel(carDTO.getModel());
             car.setRegistration(carDTO.getRegistration());
             car.setPrice(carDTO.getPrice());
-    
-            // 调用 CarService 中的 addCar 方法来保存车辆信息
+
+            logger.info("Adding new car: {}", carDTO);
+
             carService.addCar(carDTO, image, userId);
-    
-        } catch (IOException | ResourceNotFoundException e) {
+
+        } catch (IOException e) {
+            logger.error("Error adding car: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Error adding car: " + e.getMessage());
+            return "addCar";
+        } catch (ResourceNotFoundException e) {
+            logger.error("Error adding car: {}", e.getMessage());
             model.addAttribute("errorMessage", "Error adding car: " + e.getMessage());
             return "addCar";
         }
-    
+
         return "redirect:/cars/all";
     }
 
     @GetMapping("/all")
     public String getAllCars(Model model) {
-        model.addAttribute("cars", carService.getAllCars());
+        try {
+            List<CarDTO> cars = carService.getAllCars();
+            model.addAttribute("cars", cars);
+
+            logger.info("Fetching all cars. Count: {}", cars.size());
+
+        } catch (Exception e) {
+            logger.error("Error fetching all cars: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Error fetching all cars: " + e.getMessage());
+        }
+
         return "carList";
     }
 
@@ -95,7 +114,12 @@ public class CarController {
             model.addAttribute("carDTO", carDTO);
             return "edit";
         } catch (ResourceNotFoundException e) {
+            logger.error("Car not found: {}", e.getMessage());
             model.addAttribute("errorMessage", "Car not found");
+            return "redirect:/cars/all";
+        } catch (Exception e) {
+            logger.error("Error editing car: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Error editing car: " + e.getMessage());
             return "redirect:/cars/all";
         }
     }
@@ -109,10 +133,16 @@ public class CarController {
         try {
             carService.updateCar(carDTO, image);
         } catch (ResourceNotFoundException e) {
+            logger.error("Car not found: {}", e.getMessage());
             model.addAttribute("errorMessage", "Car not found");
             return "editCar";
         } catch (IOException e) {
+            logger.error("Error uploading image: {}", e.getMessage());
             model.addAttribute("errorMessage", "Error uploading image: " + e.getMessage());
+            return "editCar";
+        } catch (Exception e) {
+            logger.error("Error editing car: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Error editing car: " + e.getMessage());
             return "editCar";
         }
 
@@ -124,10 +154,32 @@ public class CarController {
         try {
             carService.deleteCarById(id);
             model.addAttribute("message", "Car deleted successfully.");
+
+            logger.info("Car with ID {} deleted successfully.", id);
+
         } catch (ResourceNotFoundException e) {
+            logger.error("Car not found: {}", e.getMessage());
             model.addAttribute("errorMessage", "Car not found.");
+        } catch (Exception e) {
+            logger.error("Error deleting car: {}", e.getMessage());
+            model.addAttribute("errorMessage", "Error deleting car: " + e.getMessage());
         }
 
         return "delete";
+    }
+
+    @PostMapping("/toggleActivate/{id}")
+    public String toggleActivate(@PathVariable("id") Long carId, HttpServletRequest request) {
+        try {
+            carService.toggleActivate(carId);
+            String referer = request.getHeader("Referer");
+            if (referer != null && !referer.isEmpty()) {
+                return "redirect:" + referer;
+            } else {
+                return "redirect:/cars";
+            }
+        } catch (ResourceNotFoundException e) {
+            return "redirect:/error";
+        }
     }
 }

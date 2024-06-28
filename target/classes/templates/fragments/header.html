@@ -31,6 +31,7 @@
             box-shadow: 0 5px #666;
             transform: translateY(4px);
         }
+        
     </style>
 </head>
 <body>
@@ -43,9 +44,11 @@
         <a href="/register" class="button">Register</a>
         <a href="/cars/add" class="button">Add a New Car</a>
         <a href="/cars/all" class="button">Cars List</a>
-        <p th:text="'User ID: ' + ${session.userId}"></p>
-        <p th:text="'username: ' + ${session.username}"></p>
-        <a th:href="@{/user/{userId}/cars(userId=${userId})}">My Cars</a>
+        <a th:href="@{/user/{userId}/cars(userId=${userId})}" class="button">My Cars</a>
+        <a th:href="@{/user/{userId}/profile(userId=${userId})}" class="button">My Profile</a>
+        <!--<p th:text="'User ID: ' + ${session.userId}"></p>
+        <p th:text="'username: ' + ${session.username}"></p>-->
+
     </div>
 </body>
 </html>

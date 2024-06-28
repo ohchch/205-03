@@ -63,7 +63,7 @@
 <body>
     <div th:insert="~{fragments/header :: header}"></div>
     <div class="container">
-        <h1>Car List</h1>
+        <h1>User Car List</h1>
         <table>
             <tr>
                 <th>ID</th>
@@ -74,6 +74,7 @@
                 <th>Registration</th>
                 <th>Price (RM)</th>
                 <th>Activated</th>
+                <th>Maker of reservation</th>
                 <th>Actions</th>
             </tr>
             <tr th:each="car : ${cars}">
@@ -86,7 +87,24 @@
                 <td th:text="${car.model}">Car Model</td>
                 <td th:text="${car.registration}">Registration</td>
                 <td th:text="${car.price}">Price</td>
-                <td th:text="${car.active ? 'Activated' : 'Deactivated'}">Status</td>
+                <td th:text="${car.carActivate.status}">Status</td>
+                <td>
+                    <ul>
+                        <li th:each="reservation : ${car.reservations}">
+                            <span th:text="${reservation.user.email}">User Email</span> - 
+                            <span th:text="${#temporals.format(reservation.reservationTime, 'yyyy-MM-dd HH:mm:ss')}">Reservation Time</span>
+                            <form th:action="@{/reservations/delete}" method="post" style="display:inline;">
+                                <input type="hidden" name="reservationId" th:value="${reservation.id}" />
+                                <button type="submit" class="button">Delete</button>
+                            </form>
+                        </li>
+                    </ul>                    
+                    <form th:action="@{/reservations/make}" method="post">
+                        <input type="hidden" name="carId" th:value="${car.id}" />
+                        <input type="hidden" name="userId" th:value="${#authentication.name}" />
+                        <button type="submit" class="button">Reserve</button>
+                    </form>
+                </td>
                 <td>
                     <a th:href="@{/cars/edit/{id}(id=${car.id})}" class="button">Edit</a>
                     <form th:action="@{/cars/delete/{id}(id=${car.id})}" method="post" style="display:inline;">

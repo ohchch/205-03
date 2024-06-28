@@ -13,29 +13,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.billingservice.dto.CarDTO;
+import com.example.billingservice.entities.Reservation;
 import com.example.billingservice.exceptions.ResourceNotFoundException;
-import com.example.billingservice.repositories.UserRepository;
-import com.example.billingservice.services.CarService;
+
 import com.example.billingservice.services.UserService;
+import com.example.billingservice.services.ReservationService;
 
 @Controller
 @RequestMapping("/user")
 public class UserCarController {
 
     private final UserService userService;
-    //private final CarService carService;
-    //private final UserRepository userRepository;
+    private final ReservationService reservationService;
 
-    public UserCarController(UserService userService, CarService carService, UserRepository userRepository) {
+    public UserCarController(UserService userService,ReservationService reservationService) {
         this.userService = userService;
-        //this.carService = carService;
-        //this.userRepository = userRepository;
+
+        this.reservationService = reservationService;
     }
 
     @GetMapping("/{userId}/cars")
     public String getUserCars(@PathVariable Long userId, Model model) {
         try {
             List<CarDTO> userCars = userService.getUserCars(userId);
+
+            // Iterate over userCars to fetch reservations for each car
+            for (CarDTO car : userCars) {
+                List<Reservation> reservations = reservationService.getReservationsForCar(car.getId());
+                car.setReservations(reservations);
+            }
+
             model.addAttribute("cars", userCars);
             return "usercarlist";
         } catch (ResourceNotFoundException e) {

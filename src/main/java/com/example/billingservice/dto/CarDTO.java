@@ -1,6 +1,10 @@
 package com.example.billingservice.dto;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
+
+import com.example.billingservice.entities.Reservation;
 
 public class CarDTO {
     private Long id;
@@ -16,6 +20,7 @@ public class CarDTO {
     private boolean active;
     private Double highestBiddingPrice;
     private String highestBidderEmail;
+    private List<Reservation> reservations;
     
 
     public Long getId() {
@@ -120,6 +125,14 @@ public class CarDTO {
 
     public void setHighestBidderEmail(String highestBidderEmail) {
         this.highestBidderEmail = highestBidderEmail;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
     

@@ -35,7 +35,7 @@ public class SecurityConfig {
             .authorizeHttpRequests((authorize) -> authorize
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
                 .requestMatchers("/endpoint","/", "/register","/about","/contact").permitAll()
-                .requestMatchers("/download/{fileName:.+}", "/cars/delete/**","/uploads/img/**","/upload","/cars/access-denied","/cars/add","/cars/all","/user/{userId}/cars","/user/{userId}/profile","/user/change-email","/user/change-password","/cars/toggleActivate/{id}","/cars/edit/**", "/cars/delete/**","/bidding/submit").hasAnyAuthority("User", "Administrator")
+                .requestMatchers("/download/{fileName:.+}", "/cars/delete/**","/uploads/img/**","/upload","/cars/access-denied","/cars/add","/cars/all","/user/{userId}/cars","/user/{userId}/profile","/user/change-email","/user/change-password","/cars/toggleActivate/{id}","/cars/edit/**", "/cars/delete/**","/bidding/submit","/reservations/make","reservations/car/{carId}","/reservations/delete").hasAnyAuthority("User", "Administrator")
                 .anyRequest().denyAll()
             )
             .formLogin(formlogin ->

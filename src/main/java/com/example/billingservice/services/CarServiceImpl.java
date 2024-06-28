@@ -6,12 +6,14 @@ import com.example.billingservice.entities.Activate;
 import com.example.billingservice.entities.Bidding;
 import com.example.billingservice.entities.Car;
 import com.example.billingservice.entities.CarActivate;
+import com.example.billingservice.entities.Reservation;
 import com.example.billingservice.entities.User;
 import com.example.billingservice.exceptions.ResourceNotFoundException;
 import com.example.billingservice.repositories.ActivateRepository;
 import com.example.billingservice.repositories.BiddingRepository;
 import com.example.billingservice.repositories.CarActivateRepository;
 import com.example.billingservice.repositories.CarRepository;
+import com.example.billingservice.repositories.ReservationRepository;
 import com.example.billingservice.repositories.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -52,6 +54,9 @@ public class CarServiceImpl implements CarService {
     @Autowired
     private BiddingRepository biddingRepository;
 
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     @Value("${spring.servlet.multipart.location}")
     private String uploadDir;
 
@@ -63,6 +68,21 @@ public class CarServiceImpl implements CarService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<CarDTO> getActivatedCars() {
+        return carRepository.findByCarActivate_Activate_Status("Activated").stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<CarDTO> getDeactivatedCars() {
+        return carRepository.findByCarActivate_Activate_Status("Deactivated").stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
 
     @Override
     public CarDTO getCarById(Long id) throws ResourceNotFoundException {
@@ -200,6 +220,10 @@ public class CarServiceImpl implements CarService {
             carDTO.setHighestBiddingPrice(0.0);
             carDTO.setHighestBidderEmail("No bids yet");
         }
+
+        List<Reservation> reservations = reservationRepository.findByCar(car);
+        System.out.println("Reservations for car " + car.getId() + ": " + reservations);
+        carDTO.setReservations(reservations);
 
         return carDTO;
     }

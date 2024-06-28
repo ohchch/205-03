@@ -94,10 +94,13 @@ public class CarController {
     @GetMapping("/all")
     public String getAllCars(Model model) {
         try {
-            List<CarDTO> cars = carService.getAllCars();
-            model.addAttribute("cars", cars);
+            List<CarDTO> activatedCars = carService.getActivatedCars();
+            List<CarDTO> deactivatedCars = carService.getDeactivatedCars();
 
-            logger.info("Fetching all cars. Count: {}", cars.size());
+            model.addAttribute("activatedCars", activatedCars);
+            model.addAttribute("deactivatedCars", deactivatedCars);
+
+            logger.info("Fetching all cars. Activated: {}, Deactivated: {}", activatedCars.size(), deactivatedCars.size());
 
         } catch (Exception e) {
             logger.error("Error fetching all cars: {}", e.getMessage());

@@ -21,27 +21,39 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String showLoginForm() {
+    public String showLoginForm(@RequestParam(name = "error", required = false) String error, Model model) {
+        if (error != null) {
+            if (error.equals("invalidEmail")) {
+                model.addAttribute("error", "Invalid email address.");
+            } else if (error.equals("invalidPassword")) {
+                model.addAttribute("error", "Invalid password.");
+            }
+        }
         return "login";
     }
+    
 
     @PostMapping("/login")
     public String login(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
+        User user = userService.findByEmail(email);
+        
+        if (user == null) {
+            return "redirect:/login?error=invalidEmail";
+        }
+    
         boolean isAuthenticated = userService.authenticate(email, password);
-
+    
         if (isAuthenticated) {
-            User user = userService.findByEmail(email);
             session.setAttribute("userId", user.getId());
             return "redirect:/user/" + user.getId() + "/profile";
         } else {
-            if (userService.findByEmail(email) == null) {
-                model.addAttribute("errorMessage", "User does not exist.");
-            } else {
-                model.addAttribute("errorMessage", "Invalid password.");
-            }
-            return "login";
+            return "redirect:/login?error=invalidPassword";
         }
     }
+    
+    
+    
+    
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {

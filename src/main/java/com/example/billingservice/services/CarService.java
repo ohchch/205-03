@@ -15,6 +15,8 @@ public interface CarService {
 
     List<CarDTO> getDeactivatedCars();
 
+    List<CarDTO> searchCars(String keyword);
+
     CarDTO getCarById(Long id) throws ResourceNotFoundException;
 
     CarDTO addCar(CarDTO carDTO, MultipartFile image, Long userId) throws IOException;

@@ -185,4 +185,11 @@ public class CarController {
             return "redirect:/error";
         }
     }
+
+    @GetMapping("/search")
+    public String searchCars(@RequestParam("keyword") String keyword, Model model) {
+        List<CarDTO> searchResults = carService.searchCars(keyword);
+        model.addAttribute("searchResults", searchResults);
+        return "searchResults";
+    }
 }

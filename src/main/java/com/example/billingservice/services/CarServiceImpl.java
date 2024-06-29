@@ -82,8 +82,15 @@ public class CarServiceImpl implements CarService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
 
+    @Override
+    public List<CarDTO> searchCars(String keyword) {
+        List<Car> cars = carRepository.search(keyword);
+        return cars.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
     @Override
     public CarDTO getCarById(Long id) throws ResourceNotFoundException {
         Car car = carRepository.findById(id)

@@ -46,9 +46,10 @@
         <a href="/cars/all" class="button">Cars List</a>
         <a th:href="@{/user/{userId}/cars(userId=${userId})}" class="button">My Cars</a>
         <a th:href="@{/user/{userId}/profile(userId=${userId})}" class="button">My Profile</a>
-        <!--<p th:text="'User ID: ' + ${session.userId}"></p>
-        <p th:text="'username: ' + ${session.username}"></p>-->
-
+        <form th:action="@{/cars/search}" method="get" style="margin-top: 20px;">
+            <input type="text" name="keyword" placeholder="Search by Brand, Model, Registration..." />
+            <button type="submit" class="button">Search</button>
+        </form>
     </div>
 </body>
 </html>

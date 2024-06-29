@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 50px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+        .button:hover {
+            background-color: #3e8e41;
+        }
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+        .img-size-limit {
+            max-width: 300px;
+            max-height: 200px;
+        }
+    </style>
+    <script>
+        function confirmDelete(form) {
+            if (confirm("Are you sure you want to delete this car?")) {
+                form.submit();
+            }
+        }
+    </script>
+</head>
+<body>
+<div th:insert="~{fragments/header :: header}"></div>
+<div class="container">
+    <h2>Search Results</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Registration</th>
+                <th>Price (RM)</th>
+                <th>Activated</th>
+                <th>Bidding</th>
+                <th>Maker of reservation</th>
+                <th th:if="${#authorization.expression('hasAuthority(''Administrator'')')}">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over searchResults -->
+        <tr th:each="car : ${searchResults}">
+            <td th:text="${car.id}">1</td>
+            <td>
+                <img th:src="@{${car.imagePath}}" alt="Car Image" class="img-size-limit"/>
+            </td>
+            <td th:text="${car.name}">Car Name</td>
+            <td th:text="${car.brand}">Car Brand</td>
+            <td th:text="${car.model}">Car Model</td>
+            <td th:text="${car.registration}">Registration</td>
+            <td th:text="${car.price}">Price</td>
+            <td th:text="${car.carActivate.status}">Status</td>
+            <td>
+                <p>Current Highest Bid: RM<span th:text="${car.highestBiddingPrice}">0.00</span></p>
+                <p>Highest Bidder: <span th:text="${car.highestBidderEmail}">No bids yet</span></p>
+                <form th:action="@{/bidding/submit}" method="post">
+                    <input type="hidden" name="carId" th:value="${car.id}" />
+                    <input type="number" step="0.01" name="biddingPrice" placeholder="Enter your bid" required />
+                    <button type="submit" class="button">Bid</button>
+                </form>
+            </td>
+            <td>
+                <ul>
+                    <li th:each="reservation : ${car.reservations}">
+                        <span th:text="${reservation.user.email}">User Email</span> - 
+                        <span th:text="${#temporals.format(reservation.reservationTime, 'yyyy-MM-dd HH:mm:ss')}">Reservation Time</span>
+                        <form th:if="${#authorization.expression('hasAuthority(''Administrator'')')}" th:action="@{/reservations/delete}" method="post" style="display:inline;">
+                            <input type="hidden" name="reservationId" th:value="${reservation.id}" />
+                            <button type="submit" class="button">Delete</button>
+                        </form>
+                    </li>
+                </ul>                    
+                <form th:action="@{/reservations/make}" method="post">
+                    <input type="hidden" name="carId" th:value="${car.id}" />
+                    <input type="hidden" name="userId" th:value="${#authentication.name}" />
+                    <button type="submit" class="button">Reserve</button>
+                </form>
+            </td>
+            <td th:if="${#authorization.expression('hasAuthority(''Administrator'')')}">
+                <a th:href="@{/cars/edit/{id}(id=${car.id})}" class="button">Edit</a>
+                <form th:action="@{/cars/delete/{id}(id=${car.id})}" method="post" style="display:inline;">
+                    <button type="button" class="button" onclick="confirmDelete(this.form)">Delete</button>
+                </form>
+                <form th:action="@{/cars/toggleActivate/{id}(id=${car.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="button">Toggle Activate</button>
+                </form>
+                
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/cars/all" class="button">Back to Cars List</a>
+</div>
+</body>
+</html>

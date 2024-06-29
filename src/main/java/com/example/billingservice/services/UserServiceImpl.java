@@ -1,6 +1,5 @@
 package com.example.billingservice.services;
 
-import com.example.billingservice.repositories.UserRepository;
 import com.example.billingservice.dto.ActivateDTO;
 import com.example.billingservice.dto.CarDTO;
 import com.example.billingservice.entities.Activate;
@@ -10,26 +9,28 @@ import com.example.billingservice.entities.User;
 import com.example.billingservice.exceptions.ResourceNotFoundException;
 import com.example.billingservice.repositories.CarRepository;
 import com.example.billingservice.repositories.PermissionRepository;
+import com.example.billingservice.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
+
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final PermissionRepository permissionRepository;
     private final CarRepository carRepository;
 
-    public UserServiceImpl(UserRepository userRepository, PermissionRepository permissionRepository, BCryptPasswordEncoder passwordEncoder, CarRepository carRepository) {
+
+    public UserServiceImpl(UserRepository userRepository, PermissionRepository permissionRepository,
+                           BCryptPasswordEncoder passwordEncoder, CarRepository carRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.permissionRepository = permissionRepository;
@@ -39,7 +40,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean authenticate(String email, String password) {
         User user = userRepository.findByEmail(email).orElse(null);
-        return user != null && passwordEncoder.matches(password, user.getPassword());
+        if (user == null) {
+            throw new BadCredentialsException("UserDetailsService returned null for: " + email);
+        }
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Invalid password for: " + email);
+        }
+        return true;
     }
 
     @Override
@@ -59,8 +66,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found with email " + email));
+    public User findByEmail(String email) throws ResourceNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email " + email));
     }
 
     @Override
@@ -68,16 +76,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found with email " + email));
     }
 
+    @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
     }
 
+    @Override
     public void changeEmail(Long userId, String newEmail) {
         User user = getUserById(userId);
         user.setEmail(newEmail);
         userRepository.save(user);
     }
 
+    @Override
     public void changePassword(Long userId, String newPassword) {
         User user = getUserById(userId);
         user.setPassword(passwordEncoder.encode(newPassword));
@@ -116,8 +127,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return user.getCars().stream()
-                             .map(this::convertToDTO)
-                             .collect(Collectors.toList());
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     private CarDTO convertToDTO(Car car) {

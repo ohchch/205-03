@@ -68,6 +68,11 @@
     <div th:insert="~{fragments/header :: header}"></div>
     <div class="container">
         <h1>User Login</h1>
+        <div th:if="${param.error != null}">
+            <p style="color: red;" th:if="${#strings.contains(param.error, 'invalidPassword')}">Wrong password</p>
+            <p style="color: red;" th:if="${#strings.contains(param.error, 'userNotFound')}">Can't find the email address, please register</p>
+        </div>
+
         <form id="loginForm" th:action="@{/login}" method="post">
             <label for="email">Email:</label>
             <input type="text" id="email" name="email" required><br>
@@ -78,7 +83,7 @@
             <input type="submit" value="Login" class="button">
         </form>
 
-        <a href="/stores/add" class="button">Add Store</a>
+        <a href="/register" class="button">Register</a>
     </div>
 </body>
 

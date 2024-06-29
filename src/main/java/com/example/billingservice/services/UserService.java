@@ -9,9 +9,9 @@ import com.example.billingservice.exceptions.ResourceNotFoundException;
 public interface UserService {
     boolean authenticate(String email, String password);
     void saveUser(User user);
-    User findByEmail(String email);
-    User findByUsername(String email);
-    User getUserById(Long userId);
+    User findByEmail(String email) throws ResourceNotFoundException;
+    User findByUsername(String email) throws ResourceNotFoundException;
+    User getUserById(Long userId) throws ResourceNotFoundException;
     void changeEmail(Long userId, String newEmail);
     void changePassword(Long userId, String newPassword);
     void deleteUserByEmail(String email);

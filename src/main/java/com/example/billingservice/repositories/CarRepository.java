@@ -13,4 +13,10 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     Optional<Car> findByIdWithActivate(@Param("id") Long id);
 
     List<Car> findByCarActivate_Activate_Status(String status);
+
+    @Query("SELECT c FROM Car c WHERE lower(c.name) LIKE lower(concat('%', :keyword, '%')) " +
+           "OR lower(c.brand) LIKE lower(concat('%', :keyword, '%')) " +
+           "OR lower(c.model) LIKE lower(concat('%', :keyword, '%')) " +
+           "OR lower(c.registration) LIKE lower(concat('%', :keyword, '%'))")
+    List<Car> search(@Param("keyword") String keyword);
 }

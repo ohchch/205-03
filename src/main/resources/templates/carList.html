@@ -103,7 +103,7 @@
                         <li th:each="reservation : ${car.reservations}">
                             <span th:text="${reservation.user.email}">User Email</span> - 
                             <span th:text="${#temporals.format(reservation.reservationTime, 'yyyy-MM-dd HH:mm:ss')}">Reservation Time</span>
-                            <form th:action="@{/reservations/delete}" method="post" style="display:inline;">
+                            <form th:if="${#authorization.expression('hasAuthority(''Administrator'')')}" th:action="@{/reservations/delete}" method="post" style="display:inline;">
                                 <input type="hidden" name="reservationId" th:value="${reservation.id}" />
                                 <button type="submit" class="button">Delete</button>
                             </form>

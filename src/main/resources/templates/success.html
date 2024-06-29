@@ -53,7 +53,9 @@
 </head>
 <body>
     <div th:insert="~{fragments/header :: header}"></div>
-    <h1>Cars added successfully!</h1>
-    <a th:href="@{/cars/all}" class="button">Cars List</a>
+    <div class="container">
+        <h1>Registration Successful!</h1>
+        <a th:href="@{/user/{userId}/profile(userId=${#authentication.name})}" class="button">View Profile</a>
+    </div>
 </body>
 </html>

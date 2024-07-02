@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserCarRepository extends JpaRepository<UserCar, Long> {
+    void deleteByCar_Id(Long carId);
 }

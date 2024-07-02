@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BiddingRepository extends JpaRepository<Bidding, Long> {
     Bidding findTopByCarOrderByBiddingPriceDesc(Car car);
+    void deleteByCar(Car car);
 }

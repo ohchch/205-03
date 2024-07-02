@@ -54,7 +54,12 @@ public class CarController {
     }
 
     @PostMapping("/add")
-    public String addCar(@RequestParam("userId") Long userId, @Valid @ModelAttribute("carDTO") CarDTO carDTO, BindingResult result, @RequestParam("image") MultipartFile image, Model model, Authentication authentication) {
+    public String addCar(
+            @RequestParam("userId") Long userId,
+            @Valid @ModelAttribute("carDTO") CarDTO carDTO,
+            BindingResult result, @RequestParam("image") MultipartFile image,
+            Model model, Authentication authentication
+    ) {
         if (result.hasErrors()) {
             return "addCar";
         }

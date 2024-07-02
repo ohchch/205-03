@@ -14,6 +14,7 @@ import com.example.billingservice.repositories.BiddingRepository;
 import com.example.billingservice.repositories.CarActivateRepository;
 import com.example.billingservice.repositories.CarRepository;
 import com.example.billingservice.repositories.ReservationRepository;
+import com.example.billingservice.repositories.UserCarRepository;
 import com.example.billingservice.repositories.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -56,6 +57,9 @@ public class CarServiceImpl implements CarService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private UserCarRepository userCarRepository;
 
     @Value("${spring.servlet.multipart.location}")
     private String uploadDir;
@@ -131,7 +135,6 @@ public class CarServiceImpl implements CarService {
         car.setRegistration(carDTO.getRegistration());
         car.setPrice(carDTO.getPrice());
 
-        saveCarActivate(carDTO, car);
 
         if (!image.isEmpty()) {
             saveImage(car, image);
@@ -141,18 +144,21 @@ public class CarServiceImpl implements CarService {
         return convertToDTO(car);
     }
 
-    @Override
-    @Transactional
-    public void deleteCarById(Long id) throws ResourceNotFoundException {
-        Car car = carRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+@Override
+@Transactional
+public void deleteCarById(Long id) throws ResourceNotFoundException {
+    Car car = carRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Car not found"));
 
-        deleteImageFile(car);
 
-        carActivateRepository.deleteByCarId(car.getId());
+    userCarRepository.deleteByCar_Id(car.getId());
+    carActivateRepository.deleteByCarId(car.getId());
+    reservationRepository.deleteByCar(car);
+    biddingRepository.deleteByCar(car);
+    deleteImageFile(car);
+    carRepository.delete(car);
+}
 
-        carRepository.delete(car);
-    }
 
 
 

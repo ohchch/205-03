@@ -59,7 +59,7 @@
         <form id="carForm" th:action="@{/cars/edit/{id}(id=${carDTO.id})}" th:object="${carDTO}" method="post" enctype="multipart/form-data">
             <input type="hidden" th:field="*{id}">
             
-            <label for="name">Name:</label>
+            <label for="name">Plate Number:</label>
             <input type="text" id="name" name="name" th:field="*{name}" required><br>
             
             <label for="brand">Brand:</label>

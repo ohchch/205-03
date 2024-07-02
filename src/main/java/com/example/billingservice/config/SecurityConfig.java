@@ -53,7 +53,7 @@ public class SecurityConfig {
                     .loginPage("/login")
                     .usernameParameter("email")
                     .successHandler(customAuthenticationSuccessHandler)
-                    .failureHandler(customAuthenticationFailureHandler) // Injected here
+                    .failureHandler(customAuthenticationFailureHandler) 
                     .permitAll()
             )
             .logout(logout ->
@@ -62,7 +62,7 @@ public class SecurityConfig {
             )
             .exceptionHandling(exceptionHandling ->
                 exceptionHandling
-                    .accessDeniedHandler(accessDeniedHandler())  // Custom access denied handler
+                    .accessDeniedHandler(accessDeniedHandler()) 
             )
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
